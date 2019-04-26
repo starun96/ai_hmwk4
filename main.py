@@ -1,6 +1,44 @@
-def do_art(s):
-    """ generates and saves an image at the filepath s, returns nothing """
-    pass
+import turtle
+from scipy import signal
+import random
+
+
+def gen_tree(center, heading, angle_span):
+    turtle.setpos(center)
+    turtle.setheading(heading)
+
+
+def do_art(filepath):
+    """ generates and saves an image at the filepath s, returns    nothing """
+    # initialize the turtle
+    window = turtle.Screen()
+    window.setup(width=800, height=600, startx=10, starty=0.5)
+    crush = turtle.Turtle()
+    crush.shape("turtle")
+
+    """ current = 0
+    seen = set()
+
+    # step sizes increase by 1 each time
+    for step_size in range(1, 100):
+        backwards = current - step_size
+
+        if backwards > 0 and backwards not in seen:
+            crush.setheading(90)
+            crush.circle(step_size / 2, 180)
+            current = backwards
+
+            seen.add(current)
+
+        else:
+            crush.setheading(270)
+            crush.circle(step_size/2, 180)
+            seen.add(current) """
+
+    current_pos = crush.position()
+    crush.circle(30, 120)
+
+    turtle.done()
 
 
 def bet(state):
@@ -38,3 +76,8 @@ def bet(state):
     """
 
     pass
+
+
+if __name__ == "__main__":
+    filepath = "image.jpg"
+    do_art(filepath)
