@@ -8,6 +8,7 @@ crush = turtle.Turtle()
 line_length = 30
 
 colors = ['red', 'yellow', 'blue', 'green']
+rand_data = np.random.normal(loc=0.0, scale=4, size=50)
 
 
 def draw_line(center, heading, line_length, radius):
@@ -40,7 +41,7 @@ def gen_tree(center, depth, heading=90, angle_span=120):
      """
     new_center_headings = []
 
-    radius = 10
+    radius = 2 * rand_data[depth % len(rand_data)]
 
     # draw circle at [center]
     crush.penup()
@@ -84,17 +85,19 @@ def do_art(filepath):
     crush.speed(0)
 
     # generate the circle tree
-    #gen_tree((0, 0), 4)
+    gen_tree((0, 0), 4)
+    """ normal_dist = np.random.normal(loc=0, scale=5, size=500)
 
-    for i in range(4000):
-        for j in range(20):
-            crush.forward(math.sin(i / 10) * math.cos(j / 10) * 50)
-            crush.left(10)
-            """ crush.color("black", colors[i % 4])
-            crush.begin_fill()
-            crush.circle(5, 360)
-            crush.end_fill() """
-
+    for value in normal_dist:
+        crush.forward(2)
+        crush.left(value)
+        crush.forward(2)
+        crush.left(value)
+         crush.color("black", colors[i % 4])
+        crush.begin_fill()
+        crush.circle(5, 360)
+        crush.end_fill() 
+ """
     turtle.done()
 
 
