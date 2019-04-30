@@ -1,14 +1,30 @@
 import turtle
 from scipy import signal
 import random
-
-
+import numpy as np
+import math
 crush = turtle.Turtle()
-radius = 10
+
 line_length = 30
 
+colors = ['red', 'yellow', 'blue', 'green']
 
-def gen_tree(center, depth, heading=90, angle_span=360):
+
+def draw_line(center, heading, line_length, radius):
+    crush.penup()
+    crush.setpos(center)
+    crush.setheading(heading)
+    crush.forward(radius)
+    crush.pendown()
+    crush.forward(line_length)
+    crush.left(line_length)
+    crush.penup()
+    crush.forward(radius)
+
+    return (crush.pos(), crush.heading())
+
+
+def gen_tree(center, depth, heading=90, angle_span=120):
     """ 
     @param point where the circle will be drawn
     @param depth how many times to recurse 
@@ -24,47 +40,34 @@ def gen_tree(center, depth, heading=90, angle_span=360):
      """
     new_center_headings = []
 
+    radius = 10
+
     # draw circle at [center]
     crush.penup()
+    crush.color("black", colors[depth % 4])
+
     crush.setpos(center)
     crush.forward(radius)
     crush.left(90)
     crush.pendown()
+    crush.begin_fill()
     crush.circle(radius, 360)
+    crush.end_fill()
 
     if depth > 0:
         # draw first line
-        crush.penup()
-        crush.setpos(center)
-        crush.setheading(heading)
-        crush.forward(radius)
-        crush.pendown()
-        crush.forward(line_length)
-        crush.penup()
-        crush.forward(radius)
-        new_center_headings.append((crush.pos(), crush.heading()))
+        new_center_heading = draw_line(center, heading, line_length, radius)
+        new_center_headings.append(new_center_heading)
 
         # draw second line
-        crush.penup()
-        crush.setpos(center)
-        crush.setheading(heading - angle_span / 2)
-        crush.forward(radius)
-        crush.pendown()
-        crush.forward(line_length)
-        crush.penup()
-        crush.forward(radius)
-        new_center_headings.append((crush.pos(), crush.heading()))
+        new_center_heading = draw_line(
+            center, heading - angle_span / 2, line_length, radius)
+        new_center_headings.append(new_center_heading)
 
         # draw third line
-        crush.penup()
-        crush.setpos(center)
-        crush.setheading(heading + angle_span / 2)
-        crush.forward(radius)
-        crush.pendown()
-        crush.forward(line_length)
-        crush.penup()
-        crush.forward(radius)
-        new_center_headings.append((crush.pos(), crush.heading()))
+        new_center_heading = draw_line(
+            center, heading + angle_span / 2, line_length, radius)
+        new_center_headings.append(new_center_heading)
 
         # make recursive call if depth > 0
         for center_heading in new_center_headings:
@@ -81,7 +84,16 @@ def do_art(filepath):
     crush.speed(0)
 
     # generate the circle tree
-    gen_tree((0, 0), 5)
+    #gen_tree((0, 0), 4)
+
+    for i in range(4000):
+        for j in range(20):
+            crush.forward(math.sin(i / 10) * math.cos(j / 10) * 50)
+            crush.left(10)
+            """ crush.color("black", colors[i % 4])
+            crush.begin_fill()
+            crush.circle(5, 360)
+            crush.end_fill() """
 
     turtle.done()
 
