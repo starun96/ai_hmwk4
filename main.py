@@ -3,12 +3,23 @@ from scipy import signal
 import random
 import numpy as np
 import math
+from PIL import Image
+
+""" import shutil
+import os
+import tempfile
+ """
+
+TEAM_NAME = "tarjul"
+MEMBERS = ["ts4pe", "jac9vn"]
+
+
 crush = turtle.Turtle()
 
 line_length = 30
 
 colors = ['red', 'yellow', 'blue', 'green']
-rand_data = np.random.normal(loc=0.0, scale=4, size=50)
+
 
 horse_info = {}
 round_num = 0
@@ -46,7 +57,7 @@ def gen_tree(center, depth, heading=90, angle_span=120):
      """
     new_center_headings = []
 
-    radius = 2 * rand_data[depth % len(rand_data)]
+    radius = rand_data[depth % len(rand_data)]
 
     # draw circle at [center]
     crush.penup()
@@ -59,21 +70,25 @@ def gen_tree(center, depth, heading=90, angle_span=120):
     crush.begin_fill()
     crush.circle(radius, 360)
     crush.end_fill()
+    canvas = turtle.getcanvas
 
     if depth > 0:
+
         # draw first line
         new_center_heading = draw_line(center, heading, line_length, radius)
         new_center_headings.append(new_center_heading)
 
-        # draw second line
-        new_center_heading = draw_line(
-            center, heading - angle_span / 2, line_length, radius)
-        new_center_headings.append(new_center_heading)
+        if angle_span > 30:
 
-        # draw third line
-        new_center_heading = draw_line(
-            center, heading + angle_span / 2, line_length, radius)
-        new_center_headings.append(new_center_heading)
+            # draw second line
+            new_center_heading = draw_line(
+                center, heading - angle_span / 2, line_length, radius)
+            new_center_headings.append(new_center_heading)
+
+            # draw third line
+            new_center_heading = draw_line(
+                center, heading + angle_span / 2, line_length, radius)
+            new_center_headings.append(new_center_heading)
 
         # make recursive call if depth > 0
         for center_heading in new_center_headings:
@@ -86,23 +101,38 @@ def do_art(filepath):
     # initialize the turtle
     window = turtle.Screen()
     window.setup(width=800, height=600)
+    turtle.bgcolor('black')
     crush.shape("turtle")
     crush.speed(0)
-
+    crush.pensize(1)
     # generate the circle tree
-    gen_tree((0, 0), 4)
-    """ normal_dist = np.random.normal(loc=0, scale=5, size=500)
+    #gen_tree((0, 0), 10)
 
-    for value in normal_dist:
-        crush.forward(2)
-        crush.left(value)
-        crush.forward(2)
-        crush.left(value)
-         crush.color("black", colors[i % 4])
-        crush.begin_fill()
-        crush.circle(5, 360)
-        crush.end_fill()
- """
+    normal_data = np.random.normal(loc=0.0, scale=4, size=1000)
+    norm_index = 0
+    colors = ['red', 'green', 'blue', 'yellow', 'purple', 'white']
+    for degree in range(0, 360, 1):
+        crush.penup()
+        crush.goto(0, 0)
+        crush.setheading(degree)
+
+        for i in range(12, 20):
+            dist = abs(i * i * math.sin(i) / 3)
+            norm_index += 1
+            bias = normal_data[norm_index % len(normal_data)]
+            crush.penup()
+            crush.forward(dist + bias)
+            crush.pendown()
+            crush.begin_fill()
+            crush.color('white', colors[norm_index % len(colors)])
+            crush.circle(3, 360)
+            crush.end_fill()
+
+    canvas = turtle.getscreen().getcanvas()
+    canvas.postscript(file="temp.eps")
+    img = Image.open("temp.eps")
+    img.save(filepath, "png")
+
     turtle.done()
 
 
@@ -144,13 +174,13 @@ def bet(state):
     round_num += 1
 
     # add or update each horse in the global dictionary
-    for horse in state.horses:
+    for horse in state['horses']:
         if horse in horse_info:
             # if horse already exists, average its last round's outcome with its existing runtime
             existing_outcome = horse_info[horse][0]
             next_outcome = (existing_outcome + state['outcomes'][horse]) / 2
             horse_info[horse][0] = next_outcome
-        # if horse doesn't exist, add it to dictionary
+        # if horse doesn't exist, add it to dictionary (with default runtime of 10)
         horse_info[horse] = (10, state['features'][horse])
 
     # only bet after 100 rounds have happened, (gives good idea of how horses would perform)
@@ -165,28 +195,14 @@ def bet(state):
             if outcome < min_outcome:
                 min_outcome = outcome
                 min_index = horse_index
+
+        # bet on the fastest predicted horse
+        return (state['horses'][min_index], 10000)
     else:
         # bet nothing if not past 100 rounds
         return ("", 0)
 
-    min_runtime = 10
-    min_horse = ""
-    for horse, outcome in state['outcomes'].items():
-        if outcome < min_runtime:
-            min_runtime = outcome
-            min_horse = horse
-
-    # get minimum runtime and the associated horse (fastest horse)
-    min_outcome = 10
-    min_index = 0
-    for horse_index, outcome in enumerate(pred_outcomes):
-        if outcome < min_outcome:
-            min_outcome = outcome
-            min_index = horse_index
-
-    return (state['horses'][min_index], 10)
-
 
 if __name__ == "__main__":
-    filepath = "image.jpg"
+    filepath = "image.png"
     do_art(filepath)
